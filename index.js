@@ -1,10 +1,10 @@
 const express = require('express');
-const cors = require('cors')
-
+const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-require('dotenv').config()
-const port = process.env.PORT || 5000;
+require('dotenv').config();
+
 const app = express();
+const port = process.env.PORT || 5000;
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -13,24 +13,18 @@ app.use(cors({
     credentials: true
 }));
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uvkap0c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
-
-async function run() {
+async function initializeApp() {
     try {
+        const client = new MongoClient(uri, {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            }
+        });
 
-        
         await client.connect();
         const database = client.db("Antopolis");
         const animalsDB = database.collection("animals");
@@ -42,10 +36,10 @@ async function run() {
         }
 
         app.post('/allAnimals', async (req, res) => {
-            const data = req.body
+            const data = req.body;
             const result = await animalsDB.insertOne(data);
-            res.send(result)
-        })
+            res.send(result);
+        });
 
         app.put('/allCategories', async (req, res) => {
             const category = req.body.catagory;
@@ -78,24 +72,30 @@ async function run() {
             }
         });
 
-
         app.get('/allAnimals', async (req, res) => {
-          const result =await animalsDB.find().toArray()
-          res.json(result)
+            try {
+                const result = await animalsDB.find().toArray();
+                res.json(result);
+            } catch (error) {
+                console.error("Error fetching animals:", error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
         });
-        
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
+        // Close the MongoDB connection when the app terminates
+        await client.close();
     }
 }
-run().catch(console.dir);
 
+// Start the Express server
+initializeApp().then(() => {
+    app.get('/', (req, res) => {
+        res.send('Hello World!');
+    });
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
+    });
+}).catch(console.error);
