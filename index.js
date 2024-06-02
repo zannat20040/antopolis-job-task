@@ -68,21 +68,17 @@ async function run() {
         });
 
         app.get('/allCategories', async (req, res) => {
-            try {
-                const categories = await catagoriesDB.findOne({});
-                res.send(categories);
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-                res.status(500).json({ message: 'Internal server error' });
-            }
+            const categories = await catagoriesDB.findOne({});
+            res.send(categories);
         });
+
 
 
         app.get('/allAnimals', async (req, res) => {
-          const result =await animalsDB.find().toArray()
-          res.send(result)
+            const result = await animalsDB.find().toArray()
+            res.send(result)
         });
-        
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
