@@ -70,7 +70,7 @@ async function run() {
         app.get('/allCategories', async (req, res) => {
             try {
                 const categories = await catagoriesDB.findOne({});
-                res.json(categories);
+                res.send(categories);
             } catch (error) {
                 console.error("Error fetching categories:", error);
                 res.status(500).json({ message: 'Internal server error' });
@@ -80,7 +80,7 @@ async function run() {
 
         app.get('/allAnimals', async (req, res) => {
           const result =await animalsDB.find().toArray()
-          res.json(result)
+          res.send(result)
         });
         
 
