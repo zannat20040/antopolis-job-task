@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors')
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 const app = express();
@@ -9,7 +9,7 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cors({
-    origin: 'https://antopolis-client.vercel.app',
+    origin: 'https://antopolis-client.vercel.app/',
     credentials: true
 }));
 
