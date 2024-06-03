@@ -1,22 +1,22 @@
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-require('dotenv').config()
+require('dotenv').config();
 const port = process.env.PORT || 5000;
 const app = express();
 
 app.use(express.static("public"));
 app.use(express.json());
+
+// Configure CORS to allow requests from http://localhost:3000
 app.use(cors({
-    origin: 'https://antopolis-client.vercel.app',
-    credentials: true
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uvkap0c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -29,10 +29,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-
-        await client.connect();
-
-        
         const database = client.db("Antopolis");
         const animalsDB = database.collection("animals");
         const catagoriesDB = database.collection("catagories");
@@ -43,10 +39,10 @@ async function run() {
         }
 
         app.post('/allAnimals', async (req, res) => {
-            const data = req.body
+            const data = req.body;
             const result = await animalsDB.insertOne(data);
-            res.send(result)
-        })
+            res.send(result);
+        });
 
         app.put('/allCategories', async (req, res) => {
             const category = req.body.catagory;
@@ -74,13 +70,10 @@ async function run() {
             res.send(categories);
         });
 
-
-
         app.get('/allAnimals', async (req, res) => {
-            const result = await animalsDB.find().toArray()
-            res.send(result)
+            const result = await animalsDB.find().toArray();
+            res.send(result);
         });
-
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
@@ -88,11 +81,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-
 app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+    res.send('Hello World!');
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    console.log(`Example app listening on port ${port}`);
+});
